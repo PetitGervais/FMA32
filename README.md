@@ -31,3 +31,5 @@ memory_alloc : used to allocate a chunk of memory.<br>
 memory_free  : used to free a chunck previously allocated by memory_alloc.<br>
 
 Have fun with FMA32 and if you have any questions or remarks, don't hesitate your are welcome !!!
+
+Romain CARITEY
