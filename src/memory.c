@@ -1,5 +1,6 @@
 /*  This file is part of FMA32
     Fast Memory Allocator for 32 bits embedded system.
+    (Romain CARITEY - 2014)
 
     FMA32 is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -59,21 +60,21 @@ STATIC void block_get_levels(unsigned long size, memory_level_t *level)
  *****************************************************************************/
 STATIC unsigned long block_get_next_level(unsigned long size, memory_level_t *level)
 {
-	block_get_levels(size, level);
-	level->sl_bitmap <<= 1;
-	if(level->sl_bitmap == 0)
-	{
-		level->sl = 0;
-		level->fl++;
-		level->fl_bitmap <<= 1;
-		if(level->fl_bitmap == 0)
-			return 0;
-	}
-	else
-	{
-		level->sl++;
-	}
-	return 1;
+  block_get_levels(size, level);
+  level->sl_bitmap <<= 1;
+  if(level->sl_bitmap == 0)
+  {
+    level->sl = 0;
+    level->fl++;
+    level->fl_bitmap <<= 1;
+    if(level->fl_bitmap == 0)
+      return 0;
+  }
+  else
+  {
+    level->sl++;
+  }
+  return 1;
 }
 
 /******************************************************************************
@@ -86,24 +87,24 @@ STATIC void block_insert(memory_block_t * block)
 {
   memory_level_t level;
 
-	/* Update  bitmaps */
-	block_get_levels(block->size, &level);
-	*mma.first_level |= level.fl_bitmap;
-	mma.second_level[level.fl] |= level.sl_bitmap;
+  /* Update  bitmaps */
+  block_get_levels(block->size, &level);
+  *mma.first_level |= level.fl_bitmap;
+  mma.second_level[level.fl] |= level.sl_bitmap;
 
-	memory_block_t * free_blocks_ptr = mma.fbla[level.fl][level.sl];
-	if(free_blocks_ptr == NULL)
-	{
-	  /* No next block */
-		block->next = NULL;
-	}
-	else
-	{
-	  /* Update the next block */
-	  block->next = free_blocks_ptr;
-		free_blocks_ptr->prev = (struct memory_block_s *)block;
-	}
-	block->prev = NULL;
+  memory_block_t * free_blocks_ptr = mma.fbla[level.fl][level.sl];
+  if(free_blocks_ptr == NULL)
+  {
+    /* No next block */
+    block->next = NULL;
+  }
+  else
+  {
+    /* Update the next block */
+    block->next = free_blocks_ptr;
+    free_blocks_ptr->prev = (struct memory_block_s *)block;
+  }
+  block->prev = NULL;
   mma.fbla[level.fl][level.sl] = block;
   BLOCK_MARK_AS_FREE(block);
 }
@@ -120,7 +121,7 @@ STATIC void block_extract(memory_block_t * block)
 
   if(block->prev == NULL)
   {
-     block_get_levels(block->size, &level);
+    block_get_levels(block->size, &level);
     /* It is the first block in the list */
     if(block->next == NULL)
     {
@@ -155,8 +156,8 @@ STATIC void block_extract(memory_block_t * block)
   }
 
   /* Reset list pointer of the extracted block */
-	block->next = NULL;
-	block->prev = NULL;
+  block->next = NULL;
+  block->prev = NULL;
 }
 
 /******************************************************************************
@@ -230,13 +231,13 @@ STATIC void block_split(memory_block_t *block, unsigned long size)
   unsigned long tmp_size = BLOCK_GET_MASKED_SIZE(block) - size;
 
   /* Check for splitting the block */
-	if(tmp_size >= BLOCK_MIN_SIZE)
-	{
+  if(tmp_size >= BLOCK_MIN_SIZE)
+  {
     /* Split the block and create the new free block */
     new_free_block = (memory_block_t *)((unsigned long)block + size + BLOCK_HEADER_SIZE_USED);
-		new_free_block->size = tmp_size - BLOCK_HEADER_SIZE_USED;
-		new_free_block->next = NULL;
-		new_free_block->prev = NULL;
+    new_free_block->size = tmp_size - BLOCK_HEADER_SIZE_USED;
+    new_free_block->next = NULL;
+    new_free_block->prev = NULL;
     new_free_block->phys_prev = block;
 
     /* Update block size */
@@ -259,9 +260,9 @@ STATIC void block_split(memory_block_t *block, unsigned long size)
     BLOCK_MARK_AS_USED(block);
     BLOCK_MARK_AS_FREE(new_free_block);
 
-		/* Insert new free block in the chain list*/
-		block_insert(new_free_block);
-	}
+    /* Insert new free block in the chain list*/
+    block_insert(new_free_block);
+  }
   else
   {
     /* Can't split, keep the current size */
@@ -356,8 +357,8 @@ unsigned long memory_init(void * address, unsigned long length)
   unsigned long mma_area_size;
   unsigned long level_max = bit_highest_pos(bit_next_power_of_two((unsigned long)length)) - 6;
 
-	/* Align memory header address and size to be modulo 32 bits */
-	if((unsigned long)address & ALIGN_MASK)
+  /* Align memory header address and size to be modulo 32 bits */
+  if((unsigned long)address & ALIGN_MASK)
   {
     /* address is not aligned */
     address = (void *)RESIZE_UP(address, LONG_SIZE_BYTE);
@@ -368,24 +369,24 @@ unsigned long memory_init(void * address, unsigned long length)
     length = RESIZE_DOWN(length, LONG_SIZE_BYTE);
   }
 
-	/* Set the first level in the MMA */
-	mma.first_level = (unsigned long *)address;
-	mma_area_size = 4;
+  /* Set the first level in the MMA */
+  mma.first_level = (unsigned long *)address;
+  mma_area_size = 4;
 
-	/* Set the second level in the MMA */
-	mma.second_level = (unsigned long *)((unsigned long)address + mma_area_size);
-	mma_area_size += level_max * 4;
+  /* Set the second level in the MMA */
+  mma.second_level = (unsigned long *)((unsigned long)address + mma_area_size);
+  mma_area_size += level_max * 4;
 
-	/* Set the second level in the MMA */
-	mma.fbla = (memory_block_t *(*)[32])((unsigned long)address + mma_area_size);
-	mma_area_size += level_max * (32 * 4);
+  /* Set the second level in the MMA */
+  mma.fbla = (memory_block_t *(*)[32])((unsigned long)address + mma_area_size);
+  mma_area_size += level_max * (32 * 4);
 
-	/* Check the size */
-	if((mma_area_size + BLOCK_MIN_SIZE) > length)
-		return 0;
+  /* Check the size */
+  if((mma_area_size + BLOCK_MIN_SIZE) > length)
+    return 0;
 
-	/* Reset the MMA area */
-	for(reset_size = 0; reset_size < mma_area_size; reset_size++)
+  /* Reset the MMA area */
+  for(reset_size = 0; reset_size < mma_area_size; reset_size++)
     mma.first_level[reset_size] = 0;
 
   /* Set the first free block in memory block area */
@@ -416,8 +417,8 @@ unsigned long memory_init(void * address, unsigned long length)
  *****************************************************************************/
 void * memory_alloc(unsigned long size)
 {
-	memory_level_t level;
-	memory_block_t * new_block;
+  memory_level_t level;
+  memory_block_t * new_block;
 
   /* As minimum block size is 16 bytes, check the size */
   if(size > BLOCK_MIN_SIZE)
@@ -436,20 +437,20 @@ void * memory_alloc(unsigned long size)
     level.sl_bitmap = 16;
   }
 
-	/* Check if exists a free block */
-	new_block = block_find(&level);
+  /* Check if exists a free block */
+  new_block = block_find(&level);
 
-	/* If not return null */
-	if(new_block == NULL)
+  /* If not return null */
+  if(new_block == NULL)
     return NULL;
 
-	/* Extract free block from the chain list */
-	block_extract(new_block);
+  /* Extract free block from the chain list */
+  block_extract(new_block);
 
   /* Split the new block */
   block_split(new_block, size);
 
-	return (void *)((unsigned long)new_block + BLOCK_HEADER_SIZE_USED);
+  return (void *)((unsigned long)new_block + BLOCK_HEADER_SIZE_USED);
 }
 
 /******************************************************************************
@@ -468,3 +469,4 @@ void memory_free(void * ptr)
 
   block_insert(block_merge_left(block_merge_right(current_block)));
 }
+

@@ -1,5 +1,6 @@
 /*  This file is part of FMA32
     Fast Memory Allocator for 32 bits embedded system.
+    (Romain CARITEY - 2014)
 
     FMA32 is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -74,7 +75,7 @@ typedef struct {
   unsigned long fl_bitmap;
   unsigned long sl;
   unsigned long sl_bitmap;
-}memory_level_t;
+} memory_level_t;
 
 unsigned long memory_init(void * mem_ptr, unsigned long length);
 void * memory_alloc(unsigned long size);
