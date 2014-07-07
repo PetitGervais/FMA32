@@ -30,6 +30,10 @@ function.<br>
 memory_alloc : used to allocate a chunk of memory.<br>
 memory_free  : used to free a chunck previously allocated by memory_alloc.<br>
 
+TODO : 
+Add unitary test of each functions (need to refactor some parts of code)
+Try to optimize some functions to get better performances (saw with the profiler gprof)
+
 Have fun with FMA32 and if you have any questions or remarks, don't hesitate your are welcome !!!
 
 Romain CARITEY
