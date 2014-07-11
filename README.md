@@ -7,7 +7,7 @@ This project has the following structure :<br>
 │&nbsp;&nbsp; ├── bitwise.h<br>
 │&nbsp;&nbsp; ├── memory.c<br>
 │&nbsp;&nbsp; └── memory.h<br>
-└── testern&lt;br&gt;<br>
+└── tester<br>
 &nbsp;&nbsp;&nbsp; ├── Makefile<br>
 &nbsp;&nbsp;&nbsp; └── src<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ├── AllocTest.cpp<br>
